@@ -30,7 +30,7 @@ button.addEventListener("click", async () => {
 
                 try {
 
-                    status.textContent = "Processing...";
+                    status.textContent = "🤖 AI is processing your voice...";
 
                     const blob = new Blob(chunks, {
                         type: "audio/webm"
@@ -39,7 +39,6 @@ button.addEventListener("click", async () => {
                     const formData = new FormData();
                     formData.append("file", blob, "voice.webm");
 
-                    // Vercel API Route
                     const response = await fetch("/api/converse", {
                         method: "POST",
                         body: formData
@@ -49,16 +48,47 @@ button.addEventListener("click", async () => {
 
                     const data = await response.json();
 
-                    console.log("Response:", data);
+                    console.log(data);
 
                     if (!response.ok) {
-                        alert(data.detail || "Server Error");
-                        status.textContent = "Error";
-                        return;
+                        throw new Error(data.detail || "Server Error");
                     }
 
-                    chat.innerHTML += `<p><b>You:</b> ${data.user_text}</p>`;
-                    chat.innerHTML += `<p><b>AI:</b> ${data.ai_response}</p>`;
+                    // Remove welcome message
+                    const welcome = document.querySelector(".welcome");
+                    if (welcome) {
+                        welcome.remove();
+                    }
+
+                    // User Message
+                    chat.innerHTML += `
+                        <p style="
+                            background:#2563eb;
+                            color:white;
+                            padding:12px;
+                            border-radius:12px;
+                            margin-bottom:12px;
+                        ">
+                            👤 <b>You:</b><br>
+                            ${data.user_text}
+                        </p>
+                    `;
+
+                    // AI Message
+                    chat.innerHTML += `
+                        <p style="
+                            background:#7c3aed;
+                            color:white;
+                            padding:12px;
+                            border-radius:12px;
+                            margin-bottom:12px;
+                        ">
+                            🤖 <b>AI:</b><br>
+                            ${data.ai_response}
+                        </p>
+                    `;
+
+                    chat.scrollTop = chat.scrollHeight;
 
                     if (data.audio) {
 
@@ -76,19 +106,18 @@ button.addEventListener("click", async () => {
 
                         await audioPlayer.play();
 
-                    } else {
-
-                        console.log("No audio received.");
-
                     }
 
-                    status.textContent = "Finished";
+                    status.textContent = "✅ Finished";
 
-                } catch (err) {
+                }
+                catch (err) {
 
                     console.error(err);
+
+                    status.textContent = "❌ Error";
+
                     alert(err.message);
-                    status.textContent = "Error";
 
                 }
 
@@ -97,22 +126,32 @@ button.addEventListener("click", async () => {
             recorder.start();
 
             isRecording = true;
-            button.textContent = "Stop";
-            status.textContent = "Recording...";
 
-        } catch (err) {
+            button.innerHTML = "⏹ Stop Recording";
+
+            button.style.background = "#ef4444";
+
+            status.textContent = "🎙 Listening...";
+
+        }
+        catch (err) {
 
             console.error(err);
+
             alert(err.message);
 
         }
 
-    } else {
+    }
+    else {
 
         recorder.stop();
 
         isRecording = false;
-        button.textContent = "🎤 Record";
+
+        button.innerHTML = "🎤 Start Recording";
+
+        button.style.background = "";
 
     }
 

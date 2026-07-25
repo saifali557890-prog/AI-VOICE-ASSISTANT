@@ -1,35 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Voice Assistant</title>
 
-    <link rel="stylesheet" href="style.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Icons -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="container">
+    <div class="background"></div>
 
-<h1>AI Voice Assistant</h1>
+    <div class="container">
 
-<p id="status">
-Idle
-</p>
+        <div class="header">
 
-<button id="recordButton">
-🎤 Record
-</button>
+            <div class="logo">
+                🤖
+            </div>
 
-<div id="chat"></div>
+            <h1>AI Voice Assistant</h1>
 
-<audio id="audioPlayer" controls></audio>
+            <p class="subtitle">
+                Speak naturally and let AI answer you instantly.
+            </p>
 
-</div>
+        </div>
 
-<script src="script.js"></script>
+        <div class="status-box">
+
+            <span class="status-dot"></span>
+
+            <span id="status">
+                Idle
+            </span>
+
+        </div>
+
+        <button id="recordButton">
+
+            <i class="fa-solid fa-microphone"></i>
+
+            Record
+
+        </button>
+
+        <div id="chat" class="chat-box">
+
+            <div class="welcome">
+
+                <i class="fa-solid fa-robot"></i>
+
+                <p>
+                    Welcome! Click the microphone button and start talking.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="audio-section">
+
+            <h3>
+
+                <i class="fa-solid fa-volume-high"></i>
+
+                AI Voice Response
+
+            </h3>
+
+            <audio id="audioPlayer" controls></audio>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
 
 </body>
 
