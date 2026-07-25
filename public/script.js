@@ -36,23 +36,39 @@ button.addEventListener("click", async () => {
                         type: "audio/webm"
                     });
 
+                    console.log("Audio Blob:", blob);
+
                     const formData = new FormData();
                     formData.append("file", blob, "voice.webm");
 
-                    const response = await fetch("/api/converse", {
+                    console.log("Sending request to FastAPI...");
+
+                    const response = await fetch("http://127.0.0.1:8000/api/converse", {
                         method: "POST",
                         body: formData
                     });
 
-                    console.log("Status:", response.status);
+                    console.log("HTTP Status:", response.status);
 
-                    const data = await response.json();
+                    const text = await response.text();
 
-                    console.log(data);
+                    console.log("Raw Server Response:", text);
+
+                    let data = {};
+
+                    if (text) {
+                        try {
+                            data = JSON.parse(text);
+                        } catch (err) {
+                            throw new Error("Server returned invalid JSON:\n\n" + text);
+                        }
+                    }
 
                     if (!response.ok) {
                         throw new Error(data.detail || "Server Error");
                     }
+
+                    console.log("Parsed Data:", data);
 
                     // Remove welcome message
                     const welcome = document.querySelector(".welcome");
@@ -60,7 +76,7 @@ button.addEventListener("click", async () => {
                         welcome.remove();
                     }
 
-                    // User Message
+                    // User message
                     chat.innerHTML += `
                         <p style="
                             background:#2563eb;
@@ -74,7 +90,7 @@ button.addEventListener("click", async () => {
                         </p>
                     `;
 
-                    // AI Message
+                    // AI message
                     chat.innerHTML += `
                         <p style="
                             background:#7c3aed;
@@ -90,22 +106,21 @@ button.addEventListener("click", async () => {
 
                     chat.scrollTop = chat.scrollHeight;
 
+                    // Play AI voice
                     if (data.audio) {
 
                         const bytes = data.audio
                             .match(/.{1,2}/g)
                             .map(x => parseInt(x, 16));
 
-                        const uint8 = new Uint8Array(bytes);
-
-                        const audioBlob = new Blob([uint8], {
-                            type: "audio/mpeg"
-                        });
+                        const audioBlob = new Blob(
+                            [new Uint8Array(bytes)],
+                            { type: "audio/mpeg" }
+                        );
 
                         audioPlayer.src = URL.createObjectURL(audioBlob);
 
                         await audioPlayer.play();
-
                     }
 
                     status.textContent = "✅ Finished";
@@ -113,12 +128,11 @@ button.addEventListener("click", async () => {
                 }
                 catch (err) {
 
-                    console.error(err);
+                    console.error("FULL ERROR:", err);
 
                     status.textContent = "❌ Error";
 
                     alert(err.message);
-
                 }
 
             };
@@ -136,7 +150,7 @@ button.addEventListener("click", async () => {
         }
         catch (err) {
 
-            console.error(err);
+            console.error("Microphone Error:", err);
 
             alert(err.message);
 
